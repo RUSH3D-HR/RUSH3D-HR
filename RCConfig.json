@@ -1,0 +1,36 @@
+{
+   "channels": [
+      4
+   ],
+   "denoise_model": "example",
+   "group_mode": 0,
+   "input_folder": "./data/demo_data/capture/",
+   "nx": 935,
+   "ny": 667,
+   "position": null,
+   "proj_name": "demo_data_20X",
+   "psf": "dz400c_z201",
+   "psf_offset": 10,
+   "recon_model": "joint0721norm",
+   "remove_bg": 150,
+   "save_multi": 10,
+   "recon_trt": false,
+   "save_folder": "./results/demo_data",
+   "sites": [
+      1
+   ],
+   "grid": "grid",
+   "white": "white",
+   "save_roi": null,
+   "save_mip_only": false,
+   "is_full_img": 2,
+   "slim_type": 0,
+   "startX": 7151,
+   "startY": 5373,
+   "start_frame": 0,
+   "step_frame": 1,
+   "stop_frame": 0,
+   "vsr_model": "VS_LFM_81_X3",
+   "realign_only": false,
+   "skip_exist": false
+}
