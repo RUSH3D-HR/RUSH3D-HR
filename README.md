@@ -41,11 +41,11 @@ Finally, you can enable TensorRT acceleration by setting the `use_tensorrt` opti
 ## Demo
 ### Download demo dataset
 
-We have prepared a demo dataset for you to try out the pipeline. The dataset is available at TBA. Put the dataset at the "data" directory of this repository to run the demo with default configuration.
+We have prepared a demo dataset for you to try out the pipeline. The dataset is available at [Zenodo](https://zenodo.org/records/16919909). Put the dataset at the "data" directory of this repository to run the demo with default configuration.
 
 ### Download the necessary dependencies
 
-The necessary dependencies are available at TBA. Put the dependencies at the "source" directory of this repository to run the demo with default configuration.
+The necessary dependencies are available at [Zenodo](https://zenodo.org/records/16919833). Put the dependencies at the "source" directory of this repository to run the demo with default configuration.
 
 ### Run demo
 
