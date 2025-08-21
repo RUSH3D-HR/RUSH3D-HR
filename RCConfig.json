@@ -11,7 +11,7 @@
    "proj_name": "demo_data_20X",
    "psf": "dz400c_z201",
    "psf_offset": 10,
-   "recon_model": "joint0721norm",
+   "recon_model": "default",
    "remove_bg": 150,
    "save_multi": 10,
    "recon_trt": false,
