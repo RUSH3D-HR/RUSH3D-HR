@@ -1,6 +1,8 @@
 import torch
 import AIRecon
 
+# First we need to load the pytorch model and export it into onnx format
+
 model_path = './reconstruction/source/recon_model/default.pth'
 model_weight = torch.load(model_path)['model']
 model = AIRecon.make(model_weight, load_sd=True).cuda()
@@ -20,5 +22,12 @@ with torch.no_grad():
                     output_names=output_name,
                     # dynamic_axes={'psf':{1:'depth'}},
                     opset_version=16)
+    
+# Then we can use trtexec to convert the onnx model into tensorrt engine
 
 # trtexec --onnx=default.onnx --saveEngine=./reconstruction/source/recon_model/default.engine
+
+
+# Finally, enable it by settting "recon_trt" to True in the RCconfig file. 
+# NOTICE: The relative import and methods were commented out in 'recon_torch.py' for easier demo configuration.
+# Run without enable it will raise NotImplementedError. Please uncomment the relative import and methods in 'recon_torch.py' to enable it.

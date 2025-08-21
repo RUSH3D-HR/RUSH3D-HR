@@ -24,8 +24,8 @@ import queue
 import concurrent.futures
 import threading
 import traceback
-import tensorrt as trt
-from torch2trt import TRTModule
+# import tensorrt as trt
+# from torch2trt import TRTModule
 
 def init(config_path):
 
@@ -424,10 +424,11 @@ if __name__ == '__main__':
                         recon_model = AIRecon.make(model_weight, load_sd=True).to(f'cuda:{i}')
                         recon_model.eval()
                     else:
-                        logger = trt.Logger(trt.Logger.INFO)
-                        with open(config["recon_model_path"], "rb") as f, trt.Runtime(logger) as runtime:
-                            recon_model = runtime.deserialize_cuda_engine(f.read())
-                        recon_model = TRTModule(recon_model, input_names=['input','psf', 'transition'], output_names=['output'])
+                        raise NotImplementedError("Please install tensorrt to use trt models")
+                        # logger = trt.Logger(trt.Logger.INFO)
+                        # with open(config["recon_model_path"], "rb") as f, trt.Runtime(logger) as runtime:
+                        #     recon_model = runtime.deserialize_cuda_engine(f.read())
+                        # recon_model = TRTModule(recon_model, input_names=['input','psf', 'transition'], output_names=['output'])
                     recon_model_list[f'cuda:{i}'] = recon_model
             
             t_start = time()
