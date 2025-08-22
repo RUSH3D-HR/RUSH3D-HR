@@ -45,7 +45,7 @@ We have prepared a demo dataset for you to try out the pipeline. The dataset is 
 
 ### Download the necessary dependencies
 
-The necessary dependencies are available at [Zenodo](https://zenodo.org/records/16919833). Put the dependencies at the "source" directory of this repository to run the demo with default configuration.
+The necessary dependencies are available at [Zenodo](https://zenodo.org/records/16919833). Put the dependencies at the "reconstruction" directory of this repository to run the demo with default configuration.
 
 ### Run demo
 
