@@ -1,6 +1,6 @@
 # High-numerical-aperture confocal volumetric mesoscope reveals collective mesoscale immune responses
 
-This is the repository of parallel reconstruction pipeline for the paper "High-numerical-aperture confocal volumetric mesoscope reveals collective mesoscale immune responses".
+This is the repository of AI-based automated processing pipeline for the paper "High-numerical-aperture confocal volumetric mesoscope reveals collective mesoscale immune responses".
 
 ## System requirements
 
