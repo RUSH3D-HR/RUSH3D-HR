@@ -55,3 +55,9 @@ python Code/recon_torch.py
 ```
 
 This demo will run the pipeline on the demo dataset with 'RCConfig.json' at the root directory. The reconstructed volume will be saved at "result" folder. You can also specify the configuration file by adding the `--config` option.
+
+### Demo result
+The demo result is a reconstructed volume represented with TIFF format. Its maximum intensity projection is shown below.
+
+![Demo output](./cover.png)
+
