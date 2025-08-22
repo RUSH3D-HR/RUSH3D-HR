@@ -1,2 +1,2 @@
 from .models import register, make
-from . import vdfnet, serenet
+from . import serenet
