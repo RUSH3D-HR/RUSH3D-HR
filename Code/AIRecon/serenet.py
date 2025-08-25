@@ -37,17 +37,12 @@ def rolldim_resample(input, shift, crop):
     """
     grid = make_coord([i for i in [input.shape[-2], input.shape[-1]]], flatten=False).flip(-1).unsqueeze(0).to(input.device) # 1,H,W,2
     grid = grid[:,crop:-crop,crop:-crop,:]
-    # new_grid = grid + shift.view(-1, 2).flip(-1).unsqueeze(1).unsqueeze(1) * 2 / torch.tensor([input.shape[-1], input.shape[-2]], device=input.device) # C*D, H,W,2
-    # input = input.unsqueeze(1).repeat(1, shift.shape[1], 1, 1).view(-1, 1, input.shape[-2], input.shape[-1]) # C*D,1,H,W
-    # inp_all = F.grid_sample(input, new_grid, mode='bilinear', align_corners=False).view(shift.shape[0], shift.shape[1], input.shape[-2]-crop*2, input.shape[-1]-crop*2)
-    inp_all = torch.empty([input.shape[0], shift.shape[1], input.shape[-2]-crop*2, input.shape[-1]-crop*2], device=input.device)
+    inp_all = []
     input = input.unsqueeze(1) # V,1,H,W
     for i in range(shift.shape[1]):
         new_grid = grid + shift[:,i].flip(-1).unsqueeze(1).unsqueeze(1) * 2 / torch.tensor([input.shape[-1], input.shape[-2]], device=input.device) # V, H,W,2
-        inp_all[:,i:i+1] = F.grid_sample(input, new_grid, mode='bilinear', align_corners=False)
-    # del grid, new_grid, input, shift
-    # torch.cuda.empty_cache()
-    return inp_all
+        inp_all.append(F.grid_sample(input, new_grid, mode='bilinear', align_corners=False))
+    return torch.cat(inp_all, dim=1)
 
 
 @register('serenet')
