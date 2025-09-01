@@ -58,9 +58,9 @@ class Net(nn.Module):
         out = out.reshape(b,1,n,H,W).squeeze(1)
         return out
 
-class C42_Conv(nn.Module):
+class Vsnet_light(nn.Module):
     def __init__(self, ch, angRes):
-        super(C42_Conv, self).__init__()
+        super(Vsnet_light, self).__init__()
                 
         # self.relu = nn.ReLU(inplace=True)
         S_ch, A_ch = ch, ch
@@ -129,7 +129,7 @@ class CascadedBlocks(nn.Module):
         self.n_blocks = n_blocks
         body = []
         for i in range(n_blocks):
-            body.append(C42_Conv(channel, angRes))
+            body.append(Vsnet_light(channel, angRes))
         self.body = nn.Sequential(*body)
         self.conv = nn.Conv3d(channel, channel, kernel_size = (1,3,3), stride = (1,1,1), padding = (0,1,1), dilation=1,bias=False)
 
@@ -153,13 +153,3 @@ class get_loss(nn.Module):
         loss = self.criterion_Loss(SR, HR)
 
         return loss
-
-
-if __name__ == "__main__":
-    net = Net(5, 4).cuda()
-    from thop import profile
-    input = torch.randn(1, 1, 160, 160).cuda()
-    total = sum([param.nelement() for param in net.parameters()])
-    flops, params = profile(net, inputs=(input,))
-    print('   Number of parameters: %.2fM' % (total / 1e6))
-    print('   Number of FLOPs: %.2fG' % (flops / 1e9))

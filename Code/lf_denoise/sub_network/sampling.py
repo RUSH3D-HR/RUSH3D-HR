@@ -1,7 +1,6 @@
 import torch
 from einops import rearrange
 import numpy as np
-import unfoldNd
 
 operation_seed_counter = 0
 
@@ -225,15 +224,3 @@ class AugmentNoise(object):
             min_lam, max_lam = self.params
             lam = np.random.uniform(low=min_lam, high=max_lam, size=(1, 1, 1))
             return np.array(np.random.poisson(lam * x) / lam, dtype=np.float32)
-
-
-if __name__ == "__main__":
-    img = torch.randn((2, 10, 16, 64, 64))
-    mask1, mask2 = generate_mask_pair(img)
-
-    noisy_sub1 = generate_subimages(img, mask1)
-    noisy_sub2 = generate_subimages(img, mask2)
-    print(noisy_sub1.shape)
-    print(noisy_sub2.shape)
-
-
