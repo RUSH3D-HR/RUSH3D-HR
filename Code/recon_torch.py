@@ -96,19 +96,19 @@ def init(config_path):
 
     # -----------------------------------vsr model init-----------------------------
     if config["vsr_model"] is not None:
-        log_out("VSR mode AUTO")
+        log_out("Motion correction mode AUTO")
         VS_mode = 'AI'
         vsr_model_path = cur_root + f'/source/vsr_model/{config["vsr_model"]}_{VS_mode}.pth'
         vsr_generator_cfg = 'VS_LFM'
     else: 
-        log_out("VSR mode OFF")
+        log_out("Motion correction mode OFF")
         vsr_model_path = None
         vsr_generator_cfg = 'VS_LFM'
     # -----------------------------------vsr model init-----------------------------
 
     # -----------------------------------denoise model init-----------------------------
     if config["denoise_model"] is not None:
-        log_out("3X3 Denoise mode AUTO")
+        log_out("Denoise mode AUTO")
         denoise_model_path = cur_root + '/source/denoise_model/' + config["denoise_model"]
         log_out('denoise_model_path: %s' % denoise_model_path)
         denoise_thres = 0
@@ -261,7 +261,7 @@ def preprocess_grid(batch_lf_stack, config, device, channel, frame_count, grid=N
         del dis_batch
 
         # batch_lf_stack = torch.nn.functional.grid_sample(batch_lf_stack.cuda().unsqueeze(0), grid.cuda(), align_corners=True).squeeze(0) # 90,10245,14175
-        print(f"Grid calibration takes {time() - tt}")
+        print(f"Undistortion correction takes {time() - tt}")
         batch_lf_stack = batch_lf_stack.reshape(batch_lf_stack.shape[0], 683, 15, 945, 15).permute(0, 2, 4, 1, 3).reshape(batch_lf_stack.shape[0], 225, 683, 945)
         # save_realign_reshape_path = get_realign_reshape_path(config["save_folder"], config["proj_name"], config["site"], channel, 0, config["start_frame"] + frame_count + 1)
         # add_save_task(buffer, save_realign_reshape_path, batch_lf_stack[0].to(torch.int16).cpu().numpy().astype(np.uint16))
@@ -297,14 +297,14 @@ def recon_one_frame(config, batch_lf_stack, block, device, wigner_idx, batch_id,
         lock.acquire()
 
     torch.cuda.empty_cache()
-    log_out('----------start to merge and recon B%d T%d----------' % (block, config["start_frame"] + frame_count + 1))
+    log_out('----------start to process sub-FOV%d T%d----------' % (block, config["start_frame"] + frame_count + 1))
 
     t = time()
     if (not config['realign_only']) and (config['white_img'] is not None):
         batch_lf_stack = White_Balance_Debleaching(batch_lf_stack, config["white_img"][block])
     batch_lf_stack = realign_merge(batch_lf_stack, config["scan_config"], config["group_mode"],  config["wigner_id0"] + batch_id[0] + wigner_idx) # 1, 81, 477, 477
     # torch.cuda.synchronize()
-    log_out('realign-merge takes: %.5f s' % (time() - t))
+    log_out('Pixel realignment & white balance takes: %.5f s' % (time() - t))
     if config['realign_only']:
         save_realign_merge_path = get_realign_merge_path(config["save_folder"], config["proj_name"], config["site"], channel, block+1, config["start_frame"] + frame_count + 1)
         add_save_task(buffer, save_realign_merge_path, batch_lf_stack[0].to(torch.int16).cpu().numpy().astype(np.uint16))
@@ -318,9 +318,9 @@ def recon_one_frame(config, batch_lf_stack, block, device, wigner_idx, batch_id,
         batch_lf_stack, _ = VS_LFM_inference(vsr_model, batch_lf_stack, config["scan_config"], wigner_id0_vs, device)
         del vsr_model
         torch.cuda.empty_cache()
-        log_out('VSR takes: %.5f s' % (time() - t))
+        log_out('Motion correction takes: %.5f s' % (time() - t))
     else:
-        log_out('No motion, No need to VSR')
+        log_out('No motion detected')
         if config["vsr_model_path"] is not None:
             config["vsr_model_path"] = None
     if config['realign_only']:
@@ -338,7 +338,7 @@ def recon_one_frame(config, batch_lf_stack, block, device, wigner_idx, batch_id,
         batch_lf_stack = batch_lf_stack_low + batch_lf_stack_high
         batch_lf_stack = batch_lf_stack.clamp(0, 2 ** 32 - 1)
         torch.cuda.empty_cache()
-        log_out('denoise takes: %.5f s' % (time() - t))
+        log_out('Denoising takes: %.5f s' % (time() - t))
         if config['realign_only']:
             save_denoise_path = get_denoise_path(config["save_folder"], config["proj_name"], config["site"], channel, block+1, config["start_frame"] + frame_count + 1)
             add_save_task(buffer, save_denoise_path, batch_lf_stack[0].cpu().numpy().clip(0, 2 ** 16 - 1).astype(np.uint16))
@@ -366,7 +366,7 @@ def recon_one_frame(config, batch_lf_stack, block, device, wigner_idx, batch_id,
     recon_img = recon_model(lf_stack, psf_block, transition).squeeze()
     recon_img *= config['save_multi']
     torch.cuda.synchronize()
-    log_out('AI recon takes: %.5f s ' % (time() - t))
+    log_out('AI reconstruction takes: %.5f s ' % (time() - t))
     
     t = time()
     global ms_grid
@@ -494,11 +494,7 @@ if __name__ == '__main__':
                                 result = future.result()
                             except Exception as e:
                                 print("Error:", e)
-                        # for block in range(35):
-                        #     recon_one_frame(config, batch_lf_stack[block][wigner_idx:wigner_idx+9].to('cuda:%d'%(block%n_gpu)),
-                        #                                       block, 'cuda:%d'%(block%n_gpu), wigner_idx, batch_id, frame_count)
 
-                        # gc.collect()
                         frame_count += 1
                         if config['realign_only']:
                             continue # SAVE_REALIGN_ONLY
@@ -522,16 +518,16 @@ if __name__ == '__main__':
                         del volume_stack
 
                         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> parrallel trans list to numpy <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                        log_out(f'recon_list to numpy cost time:{time() - tic}')
+                        # log_out(f'recon_list to numpy cost time:{time() - tic}')
 
                         # sigmoid stitch
-                        tic = time()
+                        # tic = time()
                         if config['recon_mode'] == "AI":
                             panorama = stitch_recon_result_v4(volume_stack_thread, z=None)
                         else:
                             pass
                         del volume_stack_thread
-                        log_out(f'stitch cost time:{time()-tic}')
+                        log_out(f'Volume stitching cost time:{time()-tic}')
 
                         # SAVE HERE
                         if config['save_roi'] is not None:

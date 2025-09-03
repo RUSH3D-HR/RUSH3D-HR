@@ -331,7 +331,6 @@ def get_psf_shift_pt(psf_path, scale=15/3, depth=65, offset=0):
             d1 = d0 + depth
             assert d0 >= 0, f"psf lowerbound should <0, but d0 is {d0}"
             assert d1 <= d, f"psf upperbound should not exceed psf depth {d}, but d1 is {d1}"
-            print(d0, d1)
             psf = psf[:, d0: d1, :]
         psf /= scale
         return psf
